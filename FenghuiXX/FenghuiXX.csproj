@@ -321,6 +321,7 @@
   <ItemGroup>
     <Content Include="cx2.ico" />
     <Content Include="FodyWeavers.xml" />
+    <Content Include="package\查一查.exe" />
     <Content Include="Properties\dq22222.png" />
   </ItemGroup>
   <ItemGroup>
