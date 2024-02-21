@@ -6,6 +6,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.HSSF.UserModel;
 using System.Text;
+using System.Drawing;
 
 namespace FenghuiXX
 {
@@ -21,11 +22,14 @@ namespace FenghuiXX
         static String excelgender = "性别";
 
         static String titleleft = "尊敬的 ";
-        static String titleright = "(先生/女士):\r\n您的房间号码：\r\n";
+        static String titleright = "(先生/女士):\r\n房间号码:\r\n";
 
         // 名字/电话 查询房间号 张6
         static Dictionary<string, string> kvNameMaps = new Dictionary<string, string>();
         Dictionary<string, string> kvPhoneMaps = new Dictionary<string, string>();
+
+        //默认二维码图片
+        static string imagePath = "..\\..\\images\\001.png"; // 图片路径  ..\\..\\images\\001.png
 
         /*
         字符串编码格式 是否是UTF8 
@@ -73,12 +77,39 @@ namespace FenghuiXX
             string[] parts = str.Split('=');
             return parts[i];
         }
-        // 
+        // 查询信息最后值
         public static String geterStrEnd(String inputName, String value)
         {
-            String end = titleleft + inputName + titleright+ getGenderORPhong(value,1);
+            String end = titleleft + inputName + titleright + getGenderORPhong(value, 1);
 
             return end;
+        }
+
+        //清楚2w码
+        public static Bitmap getQingChuErPic() {           
+            String imagePath1 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "001.png");
+            try
+            {                
+                Bitmap bitmap = new Bitmap(imagePath1);//imagePath  "..\\..\\images\\001.png"
+                Console.WriteLine("成功加载图片并转换为Bitmap对象。");
+                // 在这里可以对Bitmap对象进行进一步处理或操作
+                return bitmap;
+            }
+            catch (Exception ex)
+            {
+                Bitmap flag = new Bitmap(245, 245);
+                Graphics flagGraphics = Graphics.FromImage(flag);
+                int blue = 0;
+                int white = 22;
+                while (white <= 245)
+                {
+                    flagGraphics.FillRectangle(Brushes.Gray, 0, blue, 245, 245);
+                    flagGraphics.FillRectangle(Brushes.White, 0, white, 245, 245);
+                    blue += 40;
+                    white += 40;
+                }
+                return flag;
+            }
         }
 
 

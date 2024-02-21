@@ -168,7 +168,7 @@ namespace FenghuiXX
         //清除掉 二维码！
         private void button2_Click(object sender, EventArgs e)
         {
-            Bitmap flag = new Bitmap(245, 245);
+      /*      Bitmap flag = new Bitmap(245, 245);
             Graphics flagGraphics = Graphics.FromImage(flag);
             int blue = 0;
             int white = 22;
@@ -179,7 +179,9 @@ namespace FenghuiXX
                 blue += 40;
                 white += 40;
             }
-            pictureBox1.Image = flag;// 图片显示 格子条纹
+            pictureBox1.Image = flag;// 图片显示 格子条纹*/
+
+            pictureBox1.Image= Utils.getQingChuErPic();
             this.input.Text = "";
         }
 
