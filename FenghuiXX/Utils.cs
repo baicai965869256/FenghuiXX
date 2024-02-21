@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.HSSF.UserModel;
+using System.Text;
 
 namespace FenghuiXX
 {
@@ -18,6 +19,10 @@ namespace FenghuiXX
         static String excelName = "姓名";
         static String excelPhong = "手机号";
         static String excelgender = "性别";
+
+        static String titleleft = "尊敬的 ";
+        static String titleright = "(先生/女士):\r\n您的房间号码：\r\n";
+
         // 名字/电话 查询房间号 张6
         static Dictionary<string, string> kvNameMaps = new Dictionary<string, string>();
         Dictionary<string, string> kvPhoneMaps = new Dictionary<string, string>();
@@ -40,6 +45,19 @@ namespace FenghuiXX
             }
             return bln;
         }
+        public static bool is8Encoded(string input)
+        {
+            try
+            {
+                byte[] utf8Bytes = Encoding.UTF8.GetBytes(input);
+                string utf8String = Encoding.UTF8.GetString(utf8Bytes);
+                return input == utf8String;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         // 拼接 name : gender=phone
         public static String getGenderPhong(String gender, String phong)
@@ -55,6 +73,14 @@ namespace FenghuiXX
             string[] parts = str.Split('=');
             return parts[i];
         }
+        // 
+        public static String geterStrEnd(String inputName, String value)
+        {
+            String end = titleleft + inputName + titleright+ getGenderORPhong(value,1);
+
+            return end;
+        }
+
 
         //最后的路径 显示
         public static String gendPath(String path) {
