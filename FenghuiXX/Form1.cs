@@ -1,40 +1,40 @@
-using System;
+ï»¿using System;
 using System.Drawing;
 using ZXing;
 using ZXing.QrCode;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using ZXing.QrCode.Internal;
+using FenghuiXX.utilss;
 
 namespace FenghuiXX
 {
     public partial class Form1 : Form
     {
-        //¶ÁÈ¡exceel »ñÈ¡£ºµÚÒ»ÁĞ(Í¼Æ¬id+row)ºÍÂ·¾¶
-        Dictionary<string, string> kvNameMapsEnd=new Dictionary<string, string>();
+
+        List<PersonInfoClass> personsInfoLists = new List<PersonInfoClass>();
+        //è¯»å–exceel è·å–ï¼šç¬¬ä¸€åˆ—(å›¾ç‰‡id+row)å’Œè·¯å¾„
         String excelPath;
         String inputString;
 
-        //ÖÃ¶şÎ¬Âë±àÂë
+        //ç½®äºŒç»´ç ç¼–ç 
         //QrCodeEncodingOptions qr = new QrCodeEncodingOptions();
-        
+
         QrCodeEncodingOptions qr = new QrCodeEncodingOptions
-        {//ÅäÖÃ¶şÎ¬Âë¹æ¸ñ ÕÅ7
+        {//é…ç½®äºŒç»´ç è§„æ ¼ å¼ 7
             ErrorCorrection = ErrorCorrectionLevel.H,
-            CharacterSet = "UTF-8",
-            DisableECI = false,
-   
+            CharacterSet = Constants.bianma,
+            DisableECI = false,   
         };
 
         public Form1()
         {
             InitializeComponent();
             //this.label2.Text = System.DateTime.Now.ToString("HH:mm:ss");
-            this.label1.Text = System.DateTime.Now.ToString("yyyy-MM-dd");
-            //pictureBox1.Image = Image.FromFile("dq22222.png");
+            this.label1.Text = System.DateTime.Now.ToString(Constants.timeYMD);
         }      
   
-        // 111----Ñ¡Ôñexcel ÉÏ´«
+        // 0--é€‰æ‹©excel ä¸Šä¼ 
         private void uploadExcel_Click(object sender, EventArgs e)
         {
             OpenFileDialog openDlg = new OpenFileDialog();
@@ -42,27 +42,25 @@ namespace FenghuiXX
             {
                 excelPath = openDlg.FileName;
             }
-            //Í¨¹ıÂ·¾¶ ¶ÁÈ¡excel sheet1
-            kvNameMapsEnd = Utils.ExcelToDatatable(@excelPath, true);
-            int kvNameMapsNums = kvNameMapsEnd.Keys.Count;
-            if (kvNameMapsNums == 0)
-            {              
-                MessageBox.Show("Ö»¶ÁExcelÎÄ¼ş! \r\n¹Ø±Õ±í¸ñºóÔÙ¶ÁÈ¡Êı¾İ!", "ÌáÊ¾!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                this.textBox1.Text = "ÇëÑ¡ÔñExcelÎÄ¼ş! ";
-                this.textBox2.Text = "";
-                uploadExcel.Text = "Ñ¡Ôñ±í¸ñ";
-                return;
-            }
-            // MessageBox.Show("¹²¶ÁÈ¡µ½£º" + kvNameMapsNums + " ĞĞÊı¾İ !");
+            //é€šè¿‡è·¯å¾„ é»˜è®¤è¯»å–excel sheet1
+            personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, true);
 
-            //uploadExcel ÉÏ´«ºó±äÃû³Æ
-            uploadExcel.Text = "±í¸ñÃû³Æ:";
-            // ÏÔÊ¾excel Â·¾¶            
+            int personsInfoListsNums = personsInfoLists.Count;
+            if (personsInfoListsNums == 0)
+            {              
+                MessageBox.Show(Constants.uploadExcelOnly, "æç¤º!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.textBox1.Text = Constants.uploadExcelPlease;
+                this.textBox2.Text = "";
+                uploadExcel.Text = Constants.uploadExcelText;
+                return;
+            }            
+            uploadExcel.Text = Constants.uploadExcelTextAfter;
+            // æ˜¾ç¤ºexcel è·¯å¾„            
             this.textBox1.Text = Utils.gendPath(excelPath);
-            this.textBox2.Text = "ÒÑ¶Á" + kvNameMapsNums + "ĞĞÊı¾İ";
+            this.textBox2.Text = "å·²è¯»" + personsInfoListsNums + "è¡Œæ•°æ®";
 
         }
-        // ÊäÈë ĞÕÃûµç»°
+        // è¾“å…¥ å§“åç”µè¯
         private void input_TextChanged(object sender, EventArgs e)
         {
      /*       inputString=input.Text;
@@ -70,102 +68,109 @@ namespace FenghuiXX
             if (!String.IsNullOrEmpty(inputString)) {
                 if (kvNameMapsEnd.TryGetValue("apple", out value))
                 {
-                    MessageBox.Show("ÕÒµ½ÁË"+ value, "ÌáÊ¾!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("æ‰¾åˆ°äº†"+ value, "æç¤º!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }else
                 {
-                    MessageBox.Show("ÕÒ²»µ½Êı¾İ£¡", "ÌáÊ¾!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("æ‰¾ä¸åˆ°æ•°æ®ï¼", "æç¤º!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }*/
         }
-        //2---°´Å¥£º ²éÑ¯ÈËÔ±¶şÎ¬ÂëĞÅÏ¢
+        //2---æŒ‰é’®ï¼šæŸ¥è¯¢ä¿¡æ¯&ä¿®æ”¹
         private void button1_Click(object sender, EventArgs e)
-        {
-            //ÊäÈëinput ĞÕÃûµç»° ÕÅ6
-            inputString = input.Text;        
-            String value = "";
-            if (kvNameMapsEnd.Count == 0) {
-                MessageBox.Show("ÇëÏÈÑ¡Ôñ±í¸ñ !" + value, "ÌáÊ¾!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        {   //è¾“å…¥input å§“åç”µè¯ å¼ 6
+            if (personsInfoLists.Count == 0)
+            {
+                MessageBox.Show(Constants.uploadExcelBeforePlease, "æç¤º!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
+            inputString = input.Text;        
+            String value = "";
             if (!String.IsNullOrEmpty(inputString))
             {
-                if (kvNameMapsEnd.TryGetValue(inputString, out value))
-                {                    
-                    MessageBox.Show("²éÑ¯½á¹û: "+inputString+"\r\nĞÔ±ğ: " + Utils.getGenderORPhong(value, 0)
-                        +"\r\nÊÖ»úºÅ: "+ Utils.getGenderORPhong(value, 1) );
-
-                    // erWeiMa_Load(inputString+value);                   
-                    btn_ZXing_Click(Utils.geterStrEnd(inputString, value));//2ÎªÂïÏÔÊ¾ÄÚÈİ
-                }
-                else
+                Boolean isfand = true;
+                // è®¿é—®ä½¿ç”¨
+                foreach (PersonInfoClass personinfo in personsInfoLists)
                 {
-                    MessageBox.Show("ÔİÎ´ÕÒµ½Êı¾İ !", "ÌáÊ¾!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    if (inputString.Equals(personinfo.Name) || inputString.Equals(personinfo.PhoneNumber))
+                    {
+                        isfand = false;
+                        String message = (personinfo.Name + "   " + personinfo.Gender+ Environment.NewLine
+                            + "ç”µè¯ï¼š" + personinfo.PhoneNumber+ Environment.NewLine
+                            + "æˆ¿é—´ï¼š" + personinfo.RoomNum);
+                        
+                        MessageBox.Show(message);
+                        this.input.Text = message;
+
+                        btn_ZXing_Click(Utils.geterStrEnd(personinfo.Name, personinfo.RoomNum, personinfo.Gender));//2ä¸ºå˜›æ˜¾ç¤ºå†…å®¹
+                    }                  
+                }
+                if (isfand) {
+                    MessageBox.Show(Constants.notFoundExcel, "æç¤º!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             else {
-                MessageBox.Show("ÇëÊäÈëĞÕÃû»òÊÖ»úºÅ!", "ÌáÊ¾!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Constants.namePhongPlease, "æç¤º!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
-        //1-ĞÅÏ¢Éú³É¶şÎ¬Âë 
+        //1-ä¿¡æ¯ç”ŸæˆäºŒç»´ç  
         private void btn_ZXing_Click(String erPic)
         {
-            qr.Width = pictureBox1.Width;// ÉèÖÃ¶şÎ¬Âë¿í¶ÈÓëPictureBox¿Ø¼şÏàÍ¬
+            qr.Width = pictureBox1.Width;// è®¾ç½®äºŒç»´ç å®½åº¦ä¸PictureBoxæ§ä»¶ç›¸åŒ
             qr.Height = pictureBox1.Height;
 
-            string rqcodeData = erPic;//¶şÎ¬Âëstring
+            string rqcodeData = erPic;//äºŒç»´ç string
             if (string.IsNullOrWhiteSpace(rqcodeData))
             {
-                MessageBox.Show("ÔİÎŞÊı¾İ£¡"); return;
+                MessageBox.Show(Constants.notFoundExcel); return;
             }
      
-            //Éú³É¶şÎ¬ÂëÎ»Í¼
+            //ç”ŸæˆäºŒç»´ç ä½å›¾
             BarcodeWriter wr = new BarcodeWriter();
-            wr.Format = BarcodeFormat.QR_CODE;//Ñ¡Ôñ¶şÎ¬Âë£¬»¹¿ÉÒÔÑ¡ÔñÌõÂë£¬ÀàĞÍÓĞºÜ¶à
+            wr.Format = BarcodeFormat.QR_CODE;//é€‰æ‹©äºŒç»´ç ï¼Œè¿˜å¯ä»¥é€‰æ‹©æ¡ç ï¼Œç±»å‹æœ‰å¾ˆå¤š
             wr.Options = qr;
             Bitmap bitmap = wr.Write(rqcodeData);
 
-            //pictureBox1°ó¶¨Í¼
+            //pictureBox1ç»‘å®šå›¾
             pictureBox1.Image = Image.FromHbitmap(bitmap.GetHbitmap());      
             bitmap.Dispose();
         }
 
-        //xxĞÅÏ¢Éú³É¶şÎ¬Âë 
+        //xxä¿¡æ¯ç”ŸæˆäºŒç»´ç  
         private void erWeiMa_Load(String erPic)
         {
-            // ´´½¨¶şÎ¬Âë¶ÔÏó
+            // åˆ›å»ºäºŒç»´ç å¯¹è±¡
             BarcodeWriter writer = new BarcodeWriter
             {
                 Format = BarcodeFormat.QR_CODE,
                 Options = new QrCodeEncodingOptions
                 {
-                    Width = pictureBox1.Width, // ÉèÖÃ¶şÎ¬Âë¿í¶ÈÓëPictureBox¿Ø¼şÏàÍ¬
-                    Height = pictureBox1.Height, // ÉèÖÃ¶şÎ¬Âë¸ß¶ÈÓëPictureBox¿Ø¼şÏàÍ¬
-                    Margin = 1, // ÉèÖÃ¶şÎ¬Âë±ß¾à
-                    ErrorCorrection = ZXing.QrCode.Internal.ErrorCorrectionLevel.H // ÉèÖÃ¾À´í¼¶±ğÎª×î¸ß¼¶±ğ
+                    Width = pictureBox1.Width, // è®¾ç½®äºŒç»´ç å®½åº¦ä¸PictureBoxæ§ä»¶ç›¸åŒ
+                    Height = pictureBox1.Height, // è®¾ç½®äºŒç»´ç é«˜åº¦ä¸PictureBoxæ§ä»¶ç›¸åŒ
+                    Margin = 1, // è®¾ç½®äºŒç»´ç è¾¹è·
+                    ErrorCorrection = ZXing.QrCode.Internal.ErrorCorrectionLevel.H // è®¾ç½®çº é”™çº§åˆ«ä¸ºæœ€é«˜çº§åˆ«
                 }
             };
-            // Ä¬ÈÏ±àÂë¸ñÊ½£¿£¿£¿
+            // é»˜è®¤ç¼–ç æ ¼å¼ï¼Ÿï¼Ÿï¼Ÿ
           /*  Encoding encoding = Encoding.Default;
             String name = encoding.BodyName;*/
-            // gb2312ÎÄ±¾×ª-----utf8±àÂë
+            // gb2312æ–‡æœ¬è½¬-----utf8ç¼–ç 
             // String utf8String = gb2312turnUtf8(tmpxx);
             //Boolean b = isNotUTF8(utf8String);
 
-          /*  byte[] utf8Bytes = Encoding.Default.GetBytes(erPic); // »ñÈ¡Ä¬ÈÏ±àÂëµÄ×Ö½ÚÊı×é
-            string utf8String = Encoding.UTF8.GetString(utf8Bytes); // ½«×Ö½ÚÊı×é×ª»»ÎªUTF-8×Ö·û´®   
-            MessageBox.Show("222ÊÇÃ´£¿" + Utils.is8Encoded(utf8String)); */
+          /*  byte[] utf8Bytes = Encoding.Default.GetBytes(erPic); // è·å–é»˜è®¤ç¼–ç çš„å­—èŠ‚æ•°ç»„
+            string utf8String = Encoding.UTF8.GetString(utf8Bytes); // å°†å­—èŠ‚æ•°ç»„è½¬æ¢ä¸ºUTF-8å­—ç¬¦ä¸²   
+            MessageBox.Show("222æ˜¯ä¹ˆï¼Ÿ" + Utils.is8Encoded(utf8String)); */
 
-            // Éú³É¶şÎ¬ÂëÍ¼Æ¬ ÕÅ6
+            // ç”ŸæˆäºŒç»´ç å›¾ç‰‡ å¼ 6
             Bitmap qrCodeImage = writer.Write(erPic);
            // Bitmap qrCodeImage = exportErPic(utf8String);
-            // ½«¶şÎ¬ÂëÍ¼Æ¬ÉèÖÃÎªPictureBox¿Ø¼şµÄImageÊôĞÔ
+            // å°†äºŒç»´ç å›¾ç‰‡è®¾ç½®ä¸ºPictureBoxæ§ä»¶çš„Imageå±æ€§
             pictureBox1.Image = qrCodeImage;
         }
 
-
-
-        //Çå³ıµô ¶şÎ¬Âë£¡
+        //æ¸…é™¤æ‰ äºŒç»´ç ï¼
         private void button2_Click(object sender, EventArgs e)
         {
       /*      Bitmap flag = new Bitmap(245, 245);
@@ -179,19 +184,17 @@ namespace FenghuiXX
                 blue += 40;
                 white += 40;
             }
-            pictureBox1.Image = flag;// Í¼Æ¬ÏÔÊ¾ ¸ñ×ÓÌõÎÆ*/
+            pictureBox1.Image = flag;// å›¾ç‰‡æ˜¾ç¤º æ ¼å­æ¡çº¹*/
 
             pictureBox1.Image= Utils.getQingChuErPic();
             this.input.Text = "";
         }
 
-
-        private string Notes = "ĞÕÃû»òÊÖ»ú(ºóËÄÎ»)";
         private void input_Enter(object sender, EventArgs e)
         {
-            //  ½øÈë»ñµÃ½¹µã£¬Çå¿Õ
+            //  è¿›å…¥è·å¾—ç„¦ç‚¹ï¼Œæ¸…ç©º
             this.input.Text = "";
-            if (input.Text == Notes)
+            if (input.Text == Constants.Notes)
             {
                 input.ForeColor = Color.Black;
                 this.input.Text = "";
@@ -200,11 +203,11 @@ namespace FenghuiXX
 
         private void input_MouseLeave(object sender, EventArgs e)
         {
-            //  ÍË³öÊ§È¥½¹µã£¬ÖØĞÂÏÔÊ¾
+            //  é€€å‡ºå¤±å»ç„¦ç‚¹ï¼Œé‡æ–°æ˜¾ç¤º
             if (string.IsNullOrEmpty(input.Text))
             {
                 input.ForeColor = Color.DarkGray;
-                this.input.Text = Notes;
+                this.input.Text = Constants.Notes;
             }
         }
 
@@ -223,7 +226,11 @@ namespace FenghuiXX
 
         }
 
-
+        //æ”¹å˜ç­¾åˆ°äººå‘˜ é¢œè‰²ï¼Ÿworkbook.Write  {"æ— æ³•è®¿é—®å·²å…³é—­çš„æ–‡ä»¶ã€‚"} 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ProducePersonInfos.turnExcelColor(@excelPath,4,4);
+        }
     }
 
 }
