@@ -45,7 +45,7 @@ namespace FenghuiXX
             // 
             this.button1.BackColor = System.Drawing.Color.LimeGreen;
             this.button1.Font = new System.Drawing.Font("黑体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button1.Location = new System.Drawing.Point(28, 218);
+            this.button1.Location = new System.Drawing.Point(28, 227);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(126, 56);
             this.button1.TabIndex = 0;
@@ -57,9 +57,9 @@ namespace FenghuiXX
             // 
             this.pictureBox1.ErrorImage = null;
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(290, 39);
+            this.pictureBox1.Location = new System.Drawing.Point(290, 41);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(245, 244);
+            this.pictureBox1.Size = new System.Drawing.Size(243, 242);
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
@@ -68,7 +68,7 @@ namespace FenghuiXX
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("黑体", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(448, 11);
+            this.label1.Location = new System.Drawing.Point(443, 22);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 16);
             this.label1.TabIndex = 2;
@@ -101,7 +101,7 @@ namespace FenghuiXX
             // 
             // input
             // 
-            this.input.Font = new System.Drawing.Font("黑体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.input.Font = new System.Drawing.Font("黑体", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.input.ForeColor = System.Drawing.SystemColors.InfoText;
             this.input.Location = new System.Drawing.Point(28, 105);
             this.input.Multiline = true;
@@ -116,7 +116,7 @@ namespace FenghuiXX
             // 
             this.button2.BackColor = System.Drawing.Color.PaleVioletRed;
             this.button2.Font = new System.Drawing.Font("黑体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(170, 234);
+            this.button2.Location = new System.Drawing.Point(170, 243);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(69, 33);
             this.button2.TabIndex = 6;
@@ -141,7 +141,7 @@ namespace FenghuiXX
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(558, 305);
+            this.ClientSize = new System.Drawing.Size(554, 303);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.input);
