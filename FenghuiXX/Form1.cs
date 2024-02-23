@@ -6,20 +6,23 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using ZXing.QrCode.Internal;
 using FenghuiXX.utilss;
+using System.Threading;
 
 namespace FenghuiXX
 {
     public partial class Form1 : Form
     {
+        List<PersonInfoClass> personsInfoLists = new List<PersonInfoClass>();       
+        int itemListBox1CountMin = 4;
+        int itemListBox1CountMax = 7;
+        //默认4个表头可选项(4-7)  姓名0 性别1 手机号2    房间号3  级别4 抵达日期5  返程日期6
+        bool[] itemListBox1Booleans = new bool[] { true, true, true, true, false, false, false };
 
-        List<PersonInfoClass> personsInfoLists = new List<PersonInfoClass>();
         //读取exceel 获取：第一列(图片id+row)和路径
         String excelPath;
         String inputString;
 
         //置二维码编码
-        //QrCodeEncodingOptions qr = new QrCodeEncodingOptions();
-
         QrCodeEncodingOptions qr = new QrCodeEncodingOptions
         {//配置二维码规格 张7
             ErrorCorrection = ErrorCorrectionLevel.H,
@@ -32,18 +35,23 @@ namespace FenghuiXX
             InitializeComponent();
             //this.label2.Text = System.DateTime.Now.ToString("HH:mm:ss");
             this.label1.Text = System.DateTime.Now.ToString(Constants.timeYMD);
+            // 行列 选项默认隐藏
+            checkedListBox1.Visible = false;
+            listBox1.Visible = false;
+            listBox1.SelectionMode = SelectionMode.One; // 设置为单选模式
         }      
-  
-        // 0--选择excel 上传
-        private void uploadExcel_Click(object sender, EventArgs e)
+
+
+            // 0--选择excel 上传
+            private void uploadExcel_Click(object sender, EventArgs e)
         {
             OpenFileDialog openDlg = new OpenFileDialog();
             if (openDlg.ShowDialog() == DialogResult.OK)
             {
                 excelPath = openDlg.FileName;
             }
-            //通过路径 默认读取excel sheet1
-            personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, true);
+            //通过路径 默认读取excel sheet1  实体字段选择itemListBox1Booleans
+            personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, true, itemListBox1Booleans);
 
             int personsInfoListsNums = personsInfoLists.Count;
             if (personsInfoListsNums == 0)
@@ -53,11 +61,14 @@ namespace FenghuiXX
                 this.textBox2.Text = "";
                 uploadExcel.Text = Constants.uploadExcelText;
                 return;
-            }            
+            }
+            //姓名重复 ？
+            ProducePersonInfos.chongfuName(personsInfoLists);
+
             uploadExcel.Text = Constants.uploadExcelTextAfter;
             // 显示excel 路径            
             this.textBox1.Text = Utils.gendPath(excelPath);
-            this.textBox2.Text = "已读" + personsInfoListsNums + "行数据";
+            this.textBox2.Text = "已读" + personsInfoListsNums + "条数据！";
 
         }
         // 输入 姓名电话
@@ -75,7 +86,7 @@ namespace FenghuiXX
                 }
             }*/
         }
-        //2---按钮：查询信息&修改
+        //2-查询按钮：查信息&修改
         private void button1_Click(object sender, EventArgs e)
         {   //输入input 姓名电话 张6
             if (personsInfoLists.Count == 0)
@@ -83,25 +94,20 @@ namespace FenghuiXX
                 MessageBox.Show(Constants.uploadExcelBeforePlease, "提示!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
             inputString = input.Text;        
-            String value = "";
             if (!String.IsNullOrEmpty(inputString))
             {
-                Boolean isfand = true;
+                Boolean isfand = true;    
                 // 访问使用
                 foreach (PersonInfoClass personinfo in personsInfoLists)
-                {
+                {          
                     if (inputString.Equals(personinfo.Name) || inputString.Equals(personinfo.PhoneNumber))
                     {
                         isfand = false;
-                        String message = (personinfo.Name + "   " + personinfo.Gender+ Environment.NewLine
-                            + "电话：" + personinfo.PhoneNumber+ Environment.NewLine
-                            + "房间：" + personinfo.RoomNum);
-                        
-                        MessageBox.Show(message);
-                        this.input.Text = message;
-
+                           
+                        //默认消息
+                        MessageBox.Show(personinfo.ToString());
+                        this.input.Text = personinfo.ToString();
                         btn_ZXing_Click(Utils.geterStrEnd(personinfo.Name, personinfo.RoomNum, personinfo.Gender));//2为嘛显示内容
                     }                  
                 }
@@ -124,8 +130,7 @@ namespace FenghuiXX
             if (string.IsNullOrWhiteSpace(rqcodeData))
             {
                 MessageBox.Show(Constants.notFoundExcel); return;
-            }
-     
+            }     
             //生成二维码位图
             BarcodeWriter wr = new BarcodeWriter();
             wr.Format = BarcodeFormat.QR_CODE;//选择二维码，还可以选择条码，类型有很多
@@ -149,16 +154,10 @@ namespace FenghuiXX
                     Width = pictureBox1.Width, // 设置二维码宽度与PictureBox控件相同
                     Height = pictureBox1.Height, // 设置二维码高度与PictureBox控件相同
                     Margin = 1, // 设置二维码边距
-                    ErrorCorrection = ZXing.QrCode.Internal.ErrorCorrectionLevel.H // 设置纠错级别为最高级别
+                    ErrorCorrection = ZXing.QrCode.Internal.ErrorCorrectionLevel.H //纠错级别为最高级别
                 }
             };
             // 默认编码格式？？？
-          /*  Encoding encoding = Encoding.Default;
-            String name = encoding.BodyName;*/
-            // gb2312文本转-----utf8编码
-            // String utf8String = gb2312turnUtf8(tmpxx);
-            //Boolean b = isNotUTF8(utf8String);
-
           /*  byte[] utf8Bytes = Encoding.Default.GetBytes(erPic); // 获取默认编码的字节数组
             string utf8String = Encoding.UTF8.GetString(utf8Bytes); // 将字节数组转换为UTF-8字符串   
             MessageBox.Show("222是么？" + Utils.is8Encoded(utf8String)); */
@@ -185,14 +184,113 @@ namespace FenghuiXX
                 white += 40;
             }
             pictureBox1.Image = flag;// 图片显示 格子条纹*/
-
             pictureBox1.Image= Utils.getQingChuErPic();
             this.input.Text = "";
         }
 
-        private void input_Enter(object sender, EventArgs e)
+        //comboBox 选择 行列
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //  进入获得焦点，清空
+            /*if (personsInfoLists.Count == 0)
+            {
+                MessageBox.Show(Constants.uploadExcelBeforePlease, "提示!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }*/
+            string selectedOption = comboBox1.SelectedItem.ToString();
+            switch (selectedOption)
+            {
+                case "表头(行)选择":
+                    listBox1.Items.Clear();
+                    checkedListBox1.Items.Clear();
+                    //checkedListBox1.SelectionMode = SelectionMode.One;
+                    listBox1.Visible = true;
+                    checkedListBox1.Visible = false;
+                    listBox1.Items.AddRange(new object[] { "第1行", "第2行", "第3行" });
+                    break;
+                case "表格(列)选择":
+                    listBox1.Items.Clear();
+                    checkedListBox1.Items.Clear();
+                    listBox1.Visible = false;
+                    checkedListBox1.Visible = true;
+
+                    //checkedListBox1  默认Items
+                    checkedListBox1.Items.AddRange(new object[] { "姓名", "性别", "手机号", "房间号", "级别", "抵达日期", "返程日期" });
+                    for (int i = 0; i < itemListBox1CountMax; i++)
+                    {
+                        checkedListBox1.SetItemChecked(i, false);
+                    }
+                    itemListBox1CountMin = 4;
+                    for (int i = 0; i < itemListBox1CountMin; i++)
+                    {
+                        checkedListBox1.SetItemChecked(i, true);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            checkedListBox1.Visible = true;
+        }
+        // 行  选项默认隐藏
+        private void listBox1_MouseLeave(object sender, EventArgs e)
+        {
+            Thread.Sleep(300); // 睡眠1秒（1000毫秒）
+            listBox1.Visible = false;
+            checkedListBox1.Visible = false;
+
+            if (listBox1.SelectedItem != null)
+            {
+                // MessageBox.Show("您选择了：" + listBox1.SelectedItem.ToString());
+                this.input.Text = "默认表头 第3行";
+            }
+            else
+            {
+                // MessageBox.Show("默认表头，第3行！");
+                this.input.Text = "默认表头 第3行";
+            }
+
+        }
+        // 列 选项默认隐藏
+        private void checkedListBox1_MouseLeave(object sender, EventArgs e)
+        {
+            //this.Controls.Remove(checkedListBox1);
+            
+            listBox1.Visible = false;
+            checkedListBox1.Visible = false;
+
+            //元素数量 遍历选择/没选 (至少 4个)
+            int tmpnum = checkedListBox1.Items.Count;
+            itemListBox1CountMin = (tmpnum > itemListBox1CountMin) ? tmpnum : itemListBox1CountMin;
+            for (int i = 0; i < itemListBox1CountMax; i++)
+            {
+                itemListBox1Booleans[i]=checkedListBox1.GetItemChecked(i);
+            }
+           Thread.Sleep(100); // 睡眠1秒（1000毫秒）
+            //重读
+            //通过路径 默认读取excel sheet1  实体字段选择itemListBox1Booleans
+            personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, true, itemListBox1Booleans);
+
+            int personsInfoListsNums = personsInfoLists.Count;
+            if (personsInfoListsNums == 0)
+            {
+                MessageBox.Show(Constants.uploadExcelOnly, "提示!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.textBox1.Text = Constants.uploadExcelPlease;
+                this.textBox2.Text = "";
+                uploadExcel.Text = Constants.uploadExcelText;
+                return;
+            }
+            //姓名重复 ？
+            ProducePersonInfos.chongfuName(personsInfoLists);
+
+            uploadExcel.Text = Constants.uploadExcelTextAfter;
+            // 显示excel 路径            
+            this.textBox1.Text = Utils.gendPath(excelPath);
+            this.textBox2.Text = "已读" + personsInfoListsNums + "条数据！";
+        }
+
+
+        //  进入获得焦点，清空
+        private void input_Enter(object sender, EventArgs e)
+        {            
             this.input.Text = "";
             if (input.Text == Constants.Notes)
             {
@@ -201,9 +299,9 @@ namespace FenghuiXX
             }
         }
 
+        //  退出失去焦点，重新显示
         private void input_MouseLeave(object sender, EventArgs e)
-        {
-            //  退出失去焦点，重新显示
+        {            
             if (string.IsNullOrEmpty(input.Text))
             {
                 input.ForeColor = Color.DarkGray;
@@ -231,6 +329,8 @@ namespace FenghuiXX
         {
             ProducePersonInfos.turnExcelColor(@excelPath,4,4);
         }
+
+     
     }
 
 }
