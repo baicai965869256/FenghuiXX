@@ -6,6 +6,9 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.HSSF.UserModel;
 using FenghuiXX.utilss;
+using System.Linq;
+
+using System.Dynamic;
 
 namespace FenghuiXX
 {
@@ -26,7 +29,7 @@ namespace FenghuiXX
         /// <param name="sheetName">excel工作薄sheet的名称</param>
         /// <param name="isFirstRowColumn">第一行是否是DataTable的列名，true是</param>
         /// <returns>返回的DataTable</returns>
-        public static List<PersonInfoClass> ExcelToDatatable(string fileNamePath, bool isFirstRowColumn)
+        public static List<PersonInfoClass> ExcelToDatatable(string fileNamePath, bool isFirstRowColumn, bool[] itemListBox1Booleans)
         {
             int cellCount = 0;//列数
             personsInfoList.Clear();
@@ -44,7 +47,7 @@ namespace FenghuiXX
                 {                   
                     //表头 默认2（第三行）
                     IRow firstRow = sheet.GetRow(biaotouNum);
-                    cellCount = firstRow.LastCellNum; //表头行 最后一个cell的编号 即总的列数
+                    cellCount = firstRow.LastCellNum; //表头行最后一个cell的编号 即总的列数
                     /*
                      手机号 姓名 性别 房间号  列的索引
                      */
@@ -52,6 +55,9 @@ namespace FenghuiXX
                     int nameColumnIndex = -1;
                     int genderColumnIndex = -1;
                     int roomColumnIndex = -1;
+                    int levelColumnIndex = -1;
+                    int comeTimeColumnIndex = -1;
+                    int leaveTimeColumnIndex = -1;
 
                     for (int i = 0; i < cellCount; i++)
                     {
@@ -70,9 +76,18 @@ namespace FenghuiXX
                         else if (firstRow.GetCell(i).ToString() == Constants.excelROOM)
                         {
                             roomColumnIndex = i;
+                        } else if (itemListBox1Booleans[4]&& firstRow.GetCell(i).ToString() == Constants.excellevel) {
+                            levelColumnIndex = i;
+                        }else if (itemListBox1Booleans[5] && firstRow.GetCell(i).ToString() == Constants.excelComeTime)
+                        {
+                            comeTimeColumnIndex = i;
+                        }else if (itemListBox1Booleans[6] && firstRow.GetCell(i).ToString() == Constants.excelLeaveTime)
+                        {
+                            leaveTimeColumnIndex = i;
                         }
+
                     }
-                    // 遍历表头开始 3到最后一行
+                    // 表头3到最后一行
                     for (int i = biaotouNum + 1; i <= sheetLarNums; i++)
                     {
                         PersonInfoClass personInfo = new PersonInfoClass();                 
@@ -81,15 +96,30 @@ namespace FenghuiXX
                         try
                         {
                             // 手机号 姓名 性别 房间号  列的值                            
-                            string nameValue = row.GetCell(nameColumnIndex).ToString().Trim();
-                            string phoneValue = row.GetCell(phoneColumnIndex).ToString().Trim();
-                            string genderValue = row.GetCell(genderColumnIndex).ToString().Trim();
-                            string roomValue = row.GetCell(roomColumnIndex).ToString();
+                            string nameValue = row.GetCell(nameColumnIndex)?.ToString().Trim();
+                            string phoneValue = row.GetCell(phoneColumnIndex)?.ToString().Trim();
+                            string genderValue = row.GetCell(genderColumnIndex)?.ToString().Trim();
+                            string roomValue = row.GetCell(roomColumnIndex)?.ToString();
 
+                            if (levelColumnIndex != -1) {
+                                string levelValue = row.GetCell(levelColumnIndex)?.ToString().Trim();
+                                personInfo.level = string.IsNullOrEmpty(levelValue) ? Constants.excelCellNULL : levelValue;
+                            }
+                            if (levelColumnIndex != -1) {
+                                string comeTimeValue = row.GetCell(comeTimeColumnIndex) ? .ToString().Trim();
+                                personInfo.ComeTime = string.IsNullOrEmpty(comeTimeValue) ? Constants.excelCellNULL : comeTimeValue;
+                            }
+                            if (levelColumnIndex != -1)
+                            {
+                                string gleaveTimeValue = row.GetCell(leaveTimeColumnIndex)?.ToString().Trim();
+                                personInfo.LeaveTime = string.IsNullOrEmpty(gleaveTimeValue) ? Constants.excelCellNULL : gleaveTimeValue;
+                            }
+                        
                             personInfo.Name = string.IsNullOrEmpty(nameValue) ? Constants.excelCellNULL : nameValue; 
                             personInfo.Gender = string.IsNullOrEmpty(genderValue) ? Constants.excelCellNULL : genderValue;
                             personInfo.PhoneNumber = string.IsNullOrEmpty(phoneValue) ? Constants.excelCellNULL : phoneValue;
                             personInfo.RoomNum = string.IsNullOrEmpty(roomValue) ? Constants.excelCellNULL : roomValue;
+
                             personsInfoList.Add(personInfo);                                            
                         }
                         catch (Exception)
@@ -147,6 +177,25 @@ namespace FenghuiXX
 
         }
 
+        //重复的姓名有？
+        public static void chongfuName(List<PersonInfoClass> personsInfoLists )
+        {
+            int duplicateCount = personsInfoLists.GroupBy(p => p.Name)
+                       .Where(g => g.Count() > 1)
+                       .Count();
+            if (duplicateCount > 0)
+            {
+                var duplicateNames = personsInfoLists.GroupBy(p => p.Name)
+                                .Where(g => g.Count() > 1)
+                                .Select(g => g.Key);
+                foreach (var name in duplicateNames)
+                {
+                    MessageBox.Show("姓名重复的：" + name+"\r\n请优先使用电话查询！", "提示!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+
+        }
+
         //改变签到人员 颜色
         public static void turnExcelColor(string fileName,int i,int j)
         {
@@ -179,6 +228,26 @@ namespace FenghuiXX
                 // 保存更改到文件
                 workbook.Write(fs);
             }
+        }
+        // 动态加载 表头？ 
+        public static List<dynamic> ReadTxtData(string filePath)
+        {
+            List<dynamic> entityList = new List<dynamic>();
+            using (StreamReader sr = new StreamReader(filePath))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    string[] properties = line.Split(',');
+                    dynamic entity = new ExpandoObject();
+                    for (int i = 0; i < properties.Length; i++)
+                    {
+                        ((IDictionary<string, object>)entity).Add("Property" + (i + 1), properties[i]);
+                    }
+                    entityList.Add(entity);
+                }
+            }
+            return entityList;
         }
 
     }
