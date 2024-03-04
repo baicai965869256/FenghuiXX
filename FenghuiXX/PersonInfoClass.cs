@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FenghuiXX.utilss;
+using System;
 using System.Text;
 
 namespace FenghuiXX
@@ -45,11 +46,11 @@ namespace FenghuiXX
             {
                 endstr.Append($"\r\n级别: {level} ");
             }
-            if (!string.IsNullOrEmpty(ComeTime))
+            if (!string.IsNullOrEmpty(ComeTime)&& !Constants.excelCellNULL.Equals(ComeTime))
             {
                 endstr.Append($"\r\n抵达日期: {ComeTime}");
             }
-            if (!string.IsNullOrEmpty(LeaveTime))
+            if (!string.IsNullOrEmpty(LeaveTime) && !Constants.excelCellNULL.Equals(LeaveTime))
             {
                 endstr.Append($"\r\n返程日期: {LeaveTime}");
             }

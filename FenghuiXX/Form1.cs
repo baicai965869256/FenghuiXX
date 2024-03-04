@@ -10,8 +10,10 @@ using System.Threading;
 
 namespace FenghuiXX
 {
+
     public partial class Form1 : Form
     {
+        int biaotouNumSelect = 2;//表头是第三行    
         List<PersonInfoClass> personsInfoLists = new List<PersonInfoClass>();       
         int itemListBox1CountMin = 4;
         int itemListBox1CountMax = 7;
@@ -41,7 +43,6 @@ namespace FenghuiXX
             listBox1.SelectionMode = SelectionMode.One; // 设置为单选模式
         }      
 
-
             // 0--选择excel 上传
             private void uploadExcel_Click(object sender, EventArgs e)
         {
@@ -51,7 +52,7 @@ namespace FenghuiXX
                 excelPath = openDlg.FileName;
             }
             //通过路径 默认读取excel sheet1  实体字段选择itemListBox1Booleans
-            personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, true, itemListBox1Booleans);
+            personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, biaotouNumSelect, true, itemListBox1Booleans);
 
             int personsInfoListsNums = personsInfoLists.Count;
             if (personsInfoListsNums == 0)
@@ -233,20 +234,18 @@ namespace FenghuiXX
         // 行  选项默认隐藏
         private void listBox1_MouseLeave(object sender, EventArgs e)
         {
-            Thread.Sleep(300); // 睡眠1秒（1000毫秒）
+            Thread.Sleep(200); // 睡眠1秒（1000毫秒）
             listBox1.Visible = false;
             checkedListBox1.Visible = false;
 
-            if (listBox1.SelectedItem != null)
+      /*      if (listBox1.SelectedItem != null)
             {
-                // MessageBox.Show("您选择了：" + listBox1.SelectedItem.ToString());
-                this.input.Text = "默认表头 第3行";
+                this.input.Text = "表头行：" + (biaotouNumSelect + 1);
             }
             else
             {
-                // MessageBox.Show("默认表头，第3行！");
                 this.input.Text = "默认表头 第3行";
-            }
+            }*/
 
         }
         // 列 选项默认隐藏
@@ -267,7 +266,7 @@ namespace FenghuiXX
            Thread.Sleep(100); // 睡眠1秒（1000毫秒）
             //重读
             //通过路径 默认读取excel sheet1  实体字段选择itemListBox1Booleans
-            personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, true, itemListBox1Booleans);
+          /*  personsInfoLists = ProducePersonInfos.ExcelToDatatable(@excelPath, biaotouNumSelect, true, itemListBox1Booleans);
 
             int personsInfoListsNums = personsInfoLists.Count;
             if (personsInfoListsNums == 0)
@@ -284,7 +283,36 @@ namespace FenghuiXX
             uploadExcel.Text = Constants.uploadExcelTextAfter;
             // 显示excel 路径            
             this.textBox1.Text = Utils.gendPath(excelPath);
-            this.textBox2.Text = "已读" + personsInfoListsNums + "条数据！";
+            this.textBox2.Text = "已读" + personsInfoListsNums + "条数据！";*/
+        }
+
+
+        //读取 表头行123
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string curItem = listBox1.SelectedItem.ToString();
+            
+            if (curItem.Contains("1")) {
+                biaotouNumSelect = 0;
+                comboBox1.Text = "表头行：第1行" ;
+                textBox2.Text = "表头行：第1行";
+            }
+            if (curItem.Contains("2"))
+            {
+                biaotouNumSelect = 1;
+                comboBox1.Text = "表头行：第2行";
+                textBox2.Text = "表头行：第2行";
+            }
+            if (curItem.Contains("3"))
+            {
+                biaotouNumSelect = 2;
+                comboBox1.Text = "表头行：第3行";
+                textBox2.Text = "表头行：第3行";
+            }
+           // this.input.Text = "读取表头行：" + curItem;
+           // comboBox1.Text = "表头行："+(curItem+1);
+
         }
 
 
@@ -330,7 +358,6 @@ namespace FenghuiXX
             ProducePersonInfos.turnExcelColor(@excelPath,4,4);
         }
 
-     
     }
 
 }
