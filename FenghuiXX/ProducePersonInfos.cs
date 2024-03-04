@@ -29,7 +29,7 @@ namespace FenghuiXX
         /// <param name="sheetName">excel工作薄sheet的名称</param>
         /// <param name="isFirstRowColumn">第一行是否是DataTable的列名，true是</param>
         /// <returns>返回的DataTable</returns>
-        public static List<PersonInfoClass> ExcelToDatatable(string fileNamePath, bool isFirstRowColumn, bool[] itemListBox1Booleans)
+        public static List<PersonInfoClass> ExcelToDatatable(string fileNamePath,int biaotouNumSelect, bool isFirstRowColumn, bool[] itemListBox1Booleans)
         {
             int cellCount = 0;//列数
             personsInfoList.Clear();
@@ -46,7 +46,7 @@ namespace FenghuiXX
                 if (sheetLarNums > 3 && sheet != null)
                 {                   
                     //表头 默认2（第三行）
-                    IRow firstRow = sheet.GetRow(biaotouNum);
+                    IRow firstRow = sheet.GetRow(biaotouNumSelect);
                     cellCount = firstRow.LastCellNum; //表头行最后一个cell的编号 即总的列数
                     /*
                      手机号 姓名 性别 房间号  列的索引
@@ -88,7 +88,7 @@ namespace FenghuiXX
 
                     }
                     // 表头3到最后一行
-                    for (int i = biaotouNum + 1; i <= sheetLarNums; i++)
+                    for (int i = biaotouNumSelect + 1; i <= sheetLarNums; i++)
                     {
                         PersonInfoClass personInfo = new PersonInfoClass();                 
                         // 获取当前行
