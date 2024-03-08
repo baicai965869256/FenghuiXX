@@ -317,6 +317,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
+    <None Include="package\卸载app\geek.zip" />
     <None Include="package\查住宿.rar" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -341,6 +342,8 @@
     <Content Include="FodyWeavers.xml" />
     <Content Include="images\001.png" />
     <Content Include="images\图片使用.txt" />
+    <Content Include="package\查一查.exe" />
+    <Content Include="package\自动滚1.2.exe" />
     <Content Include="Properties\dq22222.png" />
   </ItemGroup>
   <ItemGroup>
